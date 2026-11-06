@@ -234,9 +234,20 @@ export function planScript(ast, { shellCommands, parse }) {
   if (dormantSources.size) opaque.add('unresolved shell source in deferred body');
   if (dormantNames.size) opaque.add('unresolved executable in deferred body');
   return Object.freeze({
-    route: unresolvedCommand ? 'unsupported' : !missing.size ? 'virtual' : node || opaque.size ? 'unsupported' : 'guest',
+    route: decideRoute({ unresolvedCommand, node, missing: missing.size }),
     missing: [...missing].sort(), node, unresolvedCommand, opaque: [...opaque].sort(),
   });
+}
+
+// This transform is only registered while an installed Linux environment owns
+// the subprocess service, so the guest is the default shell: ordinary scripts
+// keep real Linux semantics instead of being answered by the virtual shell.
+// Scripts that need the engine's Node worker stay virtual; mixing them with
+// commands the worker cannot run, or with a dynamic command name, stays a
+// clear unsupported result instead of sending half a script to either side.
+export function decideRoute({ unresolvedCommand = false, node = false, missing = 0 } = {}) {
+  if (node) return unresolvedCommand || missing > 0 ? 'unsupported' : 'virtual';
+  return 'guest';
 }
 
 export function routingTransform(argv, options) {
