@@ -154,7 +154,11 @@
 		<true/>
 	</dict>
 	<key>NSLocalNetworkUsageDescription</key>
-	<string>Connects to DSH on a computer or server you choose.</string>
+	<string>Connects to DSH on a computer or server you choose, and finds this iPhone's own Remote Pairing service for self-run phone control.</string>
+	<key>NSBonjourServices</key>
+	<array>
+		<string>_remotepairing._tcp</string>
+	</array>
 	<key>NSCameraUsageDescription</key>
 	<string>Takes photos to send to DSH as attachments.</string>
 	<key>NSRemindersFullAccessUsageDescription</key>
