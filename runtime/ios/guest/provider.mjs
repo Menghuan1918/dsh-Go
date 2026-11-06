@@ -45,9 +45,13 @@ export class GuestProvider {
     }
     // Only the policy consumed from a one-use approved confinement ticket may
     // authorize native work. No direct spawn receives an inferred wider mode.
-    if (!policy || !['read-only', 'workspace-write'].includes(policy.mode)) {
+    if (!policy || !['read-only', 'workspace-write', 'danger-full-access'].includes(policy.mode)) {
       return fail('EACCES: IOS_GUEST_POLICY_REQUIRED: Linux 执行需要现有沙箱审批产生的受限票据。', 126);
     }
+    // The guest mounts only the workspace and a private temporary directory,
+    // so full access runs there at workspace scope: it never widens the VM or
+    // hands the guest anything the other two modes would not.
+    const guestMode = policy.mode === 'read-only' ? 'read-only' : 'workspace-write';
     const paths = new GuestPaths({ workspaceRoot: policy.workspaceRoot, temporaryRoot: this.#temporaryRoot, forbiddenRoots: this.#forbiddenRoots });
     const guestCwd = paths.toGuest(cwd);
     if (guestCwd !== '/workspace' && !guestCwd.startsWith('/workspace/')) {
@@ -58,8 +62,8 @@ export class GuestProvider {
       argv: Object.freeze(['/bin/sh', ...argv.slice(1)]),
       cwd: guestCwd, stdin,
       env: guestEnvironment(env, guestCwd),
-      mode: policy.mode,
-      mounts: Object.freeze(paths.mounts.map(row => Object.freeze({ ...row, readOnly: policy.mode === 'read-only' }))),
+      mode: guestMode,
+      mounts: Object.freeze(paths.mounts.map(row => Object.freeze({ ...row, readOnly: guestMode === 'read-only' }))),
     });
     return this.#queue.execute(request, { signal, graceMs, output });
   }
