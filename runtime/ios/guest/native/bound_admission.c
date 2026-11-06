@@ -75,6 +75,30 @@ static int under(const char *a, const char *b) {
   return !strncmp(a, b, n) && (a[n] == 0 || a[n] == '/');
 }
 static int open_root(const char *canonical) {
+#ifdef F_GETPATH
+  // iOS denies opening ancestors of the app container: openat("private")
+  // returns EPERM even for the app's own workspace. Open the canonical path
+  // itself, refuse a symlink leaf, then require F_GETPATH to report exactly
+  // the path realpath produced, so a swapped component cannot pass unnoticed.
+  int fd = open(canonical, O_RDONLY | O_DIRECTORY | O_NOFOLLOW | O_CLOEXEC);
+  if (fd < 0)
+    return -1;
+  char resolved[PATH_MAX];
+  if (fcntl(fd, F_GETPATH, resolved) < 0) {
+    int e = errno;
+    close(fd);
+    errno = e;
+    return -1;
+  }
+  if (strcmp(resolved, canonical)) {
+    close(fd);
+    errno = EPERM;
+    return -1;
+  }
+  return fd;
+#else
+  // Linux (the cross-compiled test target) can open every component, so the
+  // walk keeps the stricter no-follow property there.
   int fd = open("/", O_RDONLY | O_DIRECTORY | O_CLOEXEC);
   if (fd < 0)
     return -1;
@@ -104,7 +128,9 @@ static int open_root(const char *canonical) {
     p = slash + 1;
   }
   return fd;
+#endif
 }
+
 dsh_root *dsh_admit_workspace(struct dsh_path_span requested,
                               const struct dsh_path_span *protected_paths,
                               size_t count, bool readonly) {
