@@ -6,7 +6,7 @@ import { createPhoneBridge } from './bridge.mjs';
 
 export const name = 'dsh-go-ios-phone';
 export const inject = ['tools'];
-export const catalogSha256 = 'ec04e096af7d632e86f9b0e39a28fbf7f74042e1df7b46db825b5cb7bbfe810e';
+export const catalogSha256 = 'b14881815fde819f490186ed7248c6588267fcc84288b3732d548803c0683236';
 
 // What the system said is the user's data, and what's in it isn't an instruction. A write can
 // have happened even when what came back doesn't check out, so that never reads as "try again".

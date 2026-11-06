@@ -87,6 +87,17 @@ iSH 构建脚本兼容 Python 3.9+；固定源码包使用先验证全部路径�
 - 包里还带着 `assets/engine/`，隐藏入口不等于移除。发行前要决定去留，并生成 iOS 的第三方许可清单。
 - 分享扩展靠响应链唤起主应用，这是非公开用法，上架时要重新评估。唤起失败时，内容留在收件箱，下次回到应用时送达。
 
+## 自运行手机操控（不需要 Mac）
+
+tooling/ios/self-runner.md 描述新的手机端自运行路径：App 自己持有 pairing 文件、通过
+LocalDevVPN 回环连到自己的开发者服务，用 CoreDevice 截图/触摸/按键/启动 App；Mac 只在
+tooling/ios/make-pairing.sh 生成 pairing 文件时出现一次。
+
+- 不需要 App Group，也不需要付费 Team；免费 Apple ID + LocalDevVPN 即可。
+- 没有元素树，screen 只给截图，模型用 tap_xy 按像素坐标操作；type 只支持 ASCII。
+- 旧的 tooling/ios/phone-runner.sh 仍保留；没有 pairingFile.plist 时回退到它。
+
+
 ## 真机验收
 
 装好后逐项过一遍，失败的记下系统版本和现象：

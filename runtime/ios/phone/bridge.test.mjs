@@ -8,7 +8,7 @@ import { actionFor } from './actions.mjs';
 const catalogBytes = await readFile(new URL('./catalog.json', import.meta.url));
 const catalog = JSON.parse(catalogBytes);
 test('catalog is exact Android JVM serialization, with all thirteen fixed schemas', () => {
-  assert.equal(createHash('sha256').update(catalogBytes).digest('hex'), 'ec04e096af7d632e86f9b0e39a28fbf7f74042e1df7b46db825b5cb7bbfe810e');
+  assert.equal(createHash('sha256').update(catalogBytes).digest('hex'), 'b14881815fde819f490186ed7248c6588267fcc84288b3732d548803c0683236');
   assert.deepEqual(Buffer.from(JSON.stringify(catalog)), catalogBytes);
   assert.equal(catalog.length, 13);
 });

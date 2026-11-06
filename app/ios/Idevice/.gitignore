@@ -1,0 +1,3 @@
+*.a
+sim/*.a
+idevice.h
