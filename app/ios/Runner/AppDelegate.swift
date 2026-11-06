@@ -11,6 +11,7 @@ import UserNotifications
   ) -> Bool {
     // Before launch finishes, or the tap that launched the app is lost.
     UNUserNotificationCenter.current().delegate = NotifyTaps.shared
+    UNUserNotificationCenter.current().setNotificationCategories([PhoneApprovalCenter.category])
     forgetPreviousInstall()
     return super.application(application, didFinishLaunchingWithOptions: launchOptions)
   }
@@ -31,4 +32,5 @@ import UserNotifications
       DshPlugin.register(with: registrar)
     }
   }
+
 }

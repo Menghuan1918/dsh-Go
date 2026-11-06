@@ -826,6 +826,15 @@ final class NotifyTaps: NSObject, UNUserNotificationCenterDelegate, FlutterStrea
     didReceive response: UNNotificationResponse,
     withCompletionHandler completionHandler: @escaping () -> Void
   ) {
+    let action = response.actionIdentifier
+    if action == "dsh.phone.allow" || action == "dsh.phone.deny",
+      let id = response.notification.request.content.userInfo["requestId"] as? String {
+      Task { @MainActor in
+        PhoneApprovalCenter.shared.resolve(id: id, allowed: action == PhoneApprovalCenter.allowAction)
+        completionHandler()
+      }
+      return
+    }
     let tap = response.notification.request.content.userInfo
     onMain {
       if let sink = self.sink {

@@ -163,7 +163,14 @@ final class IOSPhoneActions: NSObject, EKEventEditViewDelegate, MFMessageCompose
     _ request: IOSPhoneRequest, title: String, detail: String, allow: String = "允许一次", deny: String = "拒绝",
     waitsForever: Bool = false
   ) async -> Bool {
-    guard foreground else { return false }
+    // A sheet cannot appear over another app. When DSH Go is in the background, ask through a
+    // notification action instead: the action is guarded by Face ID/passcode, and NotifyTaps
+    // resumes this continuation. The notification body is only a short summary.
+    if !foreground {
+      return await PhoneApprovalCenter.shared.request(
+        id: request.id, title: title, detail: detail,
+        timeout: waitsForever ? 600 : 30)
+    }
     requestId = request.id
     defer { if requestId == request.id { requestId = nil } }
     let controller = IOSPhoneApproval(heading: title, detail: detail, allow: allow, deny: deny) { [weak self] allowed in
@@ -325,5 +332,69 @@ final class IOSPhoneActions: NSObject, EKEventEditViewDelegate, MFMessageCompose
   func messageComposeViewController(_ controller: MFMessageComposeViewController, didFinishWith result: MessageComposeResult) {
     guard modal === controller else { return }
     finish(result == .sent ? .success("系统报告短信已发送；不保证已送达。") : .failure("短信草稿已取消或发送失败。"))
+  }
+}
+
+
+// MARK: - Background approval
+
+/// Resolves a phone approval from a notification action when no sheet can be shown.
+/// The action has authenticationRequired, so iOS asks for Face ID/passcode before it runs.
+@MainActor
+final class PhoneApprovalCenter {
+  static let shared = PhoneApprovalCenter()
+  static let categoryIdentifier = "dsh.phone.approval"
+  static let allowAction = "dsh.phone.allow"
+  static let denyAction = "dsh.phone.deny"
+
+  static var category: UNNotificationCategory {
+    let allow = UNNotificationAction(
+      identifier: allowAction, title: "允许一次", options: [.authenticationRequired])
+    let deny = UNNotificationAction(
+      identifier: denyAction, title: "拒绝", options: [.authenticationRequired, .destructive])
+    return UNNotificationCategory(
+      identifier: categoryIdentifier, actions: [allow, deny],
+      intentIdentifiers: [], options: [.customDismissAction])
+  }
+
+  private let center = UNUserNotificationCenter.current()
+  private var pending: [String: CheckedContinuation<Bool, Never>] = [:]
+  private var timeouts: [String: Task<Void, Never>] = [:]
+
+  func request(id: String, title: String, detail: String, timeout: TimeInterval) async -> Bool {
+    let settings = await center.notificationSettings()
+    guard settings.authorizationStatus == .authorized || settings.authorizationStatus == .provisional else {
+      return false
+    }
+    let content = UNMutableNotificationContent()
+    content.title = title
+    content.body = String(detail.prefix(300))
+    content.categoryIdentifier = Self.categoryIdentifier
+    content.userInfo = ["requestId": id]
+    content.threadIdentifier = "dsh.phone.approval"
+    content.sound = .default
+    do {
+      try await center.add(UNNotificationRequest(
+        identifier: "phone-" + id, content: content, trigger: nil))
+    } catch {
+      return false
+    }
+    return await withCheckedContinuation { continuation in
+      pending[id] = continuation
+      timeouts[id] = Task { [weak self] in
+        try? await Task.sleep(nanoseconds: UInt64(max(1, timeout) * 1_000_000_000))
+        guard !Task.isCancelled else { return }
+        self?.resolve(id: id, allowed: false)
+      }
+    }
+  }
+
+  func resolve(id: String, allowed: Bool) {
+    timeouts[id]?.cancel()
+    timeouts[id] = nil
+    if let continuation = pending.removeValue(forKey: id) {
+      continuation.resume(returning: allowed)
+    }
+    center.removeDeliveredNotifications(withIdentifiers: ["phone-" + id])
   }
 }

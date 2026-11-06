@@ -42,7 +42,7 @@ final class IOSPhoneBridge: NSObject, URLSessionTaskDelegate {
     nativeClear = unsafeBitCast(clear, to: Clear.self)
     self.actions = IOSPhoneActions(presenter: presenter)
     self.browser = IOSBrowser(actions: actions, presenter: presenter)
-    self.runner = IOSPhoneRunner(actions: actions)
+    self.runner = IOSPhoneRunner(actions: actions, selfRunner: .shared)
     self.system = IOSSystemTools(actions: actions, presenter: presenter)
     self.runtimeCurrent = runtimeCurrent
     super.init()
@@ -55,6 +55,7 @@ final class IOSPhoneBridge: NSObject, URLSessionTaskDelegate {
   // Secret exists only in Swift, C memory and the consuming Node environment.
   func prepare(in cache: URL) throws -> (directory: URL, runId: String) {
     retire()
+    runner.warmUp()
     let generation = UUID().uuidString.lowercased()
     var random = [UInt8](repeating: 0, count: 32)
     guard SecRandomCopyBytes(kSecRandomDefault, random.count, &random) == errSecSuccess else {

@@ -57,6 +57,7 @@
 		D5480000000000000000F008 /* GuestKernelAccess.swift in Sources */ = {isa = PBXBuildFile; fileRef = D5480000000000000000F007 /* GuestKernelAccess.swift */; };
 		D5480000000000000000F00A /* libsqlite3.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = D5480000000000000000F009 /* libsqlite3.tbd */; };
 		D5480000000000000000F00C /* libz.tbd in Frameworks */ = {isa = PBXBuildFile; fileRef = D5480000000000000000F00B /* libz.tbd */; };
+		D5480000000000000000F102 /* IOSPhoneSelfRunner.swift in Sources */ = {isa = PBXBuildFile; fileRef = D5480000000000000000F101 /* IOSPhoneSelfRunner.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -118,6 +119,7 @@
 		D5480000000000000000A004 /* VoiceChannel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VoiceChannel.swift; sourceTree = "<group>"; };
 		D5480000000000000000C090 /* IOSSystemTools.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IOSSystemTools.swift; sourceTree = "<group>"; };
 		D5480000000000000000C080 /* IOSPhoneRunner.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IOSPhoneRunner.swift; sourceTree = "<group>"; };
+		D5480000000000000000F101 /* IOSPhoneSelfRunner.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IOSPhoneSelfRunner.swift; sourceTree = "<group>"; };
 		D5480000000000000000C070 /* IOSBrowser.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IOSBrowser.swift; sourceTree = "<group>"; };
 		D5480000000000000000C060 /* ContinuedRun.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContinuedRun.swift; sourceTree = "<group>"; };
 		D5480000000000000000C050 /* SiriIntents.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SiriIntents.swift; sourceTree = "<group>"; };
@@ -260,6 +262,7 @@
 				D5480000000000000000A004 /* VoiceChannel.swift */,
 				D5480000000000000000C090 /* IOSSystemTools.swift */,
 				D5480000000000000000C080 /* IOSPhoneRunner.swift */,
+				D5480000000000000000F101 /* IOSPhoneSelfRunner.swift */,
 				D5480000000000000000C070 /* IOSBrowser.swift */,
 				D5480000000000000000C060 /* ContinuedRun.swift */,
 				D5480000000000000000C050 /* SiriIntents.swift */,
@@ -534,6 +537,7 @@
 				D5480000000000000000A003 /* VoiceChannel.swift in Sources */,
 				D5480000000000000000C091 /* IOSSystemTools.swift in Sources */,
 				D5480000000000000000C081 /* IOSPhoneRunner.swift in Sources */,
+				D5480000000000000000F102 /* IOSPhoneSelfRunner.swift in Sources */,
 				D5480000000000000000C071 /* IOSBrowser.swift in Sources */,
 				D5480000000000000000C061 /* ContinuedRun.swift in Sources */,
 				D5480000000000000000C051 /* SiriIntents.swift in Sources */,
@@ -764,6 +768,11 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = io.github.ccch1mneyyy.dshgo;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				HEADER_SEARCH_PATHS = "$(inherited) $(SRCROOT)/Idevice";
+				"LIBRARY_SEARCH_PATHS[sdk=iphoneos*]" = "$(inherited) $(SRCROOT)/Idevice";
+				"LIBRARY_SEARCH_PATHS[sdk=iphonesimulator*]" = "$(inherited) $(SRCROOT)/Idevice/sim";
+				OTHER_LDFLAGS = "$(inherited) -lidevice_ffi -lc++ -lz -lresolv";
+				SWIFT_INCLUDE_PATHS = "$(inherited) $(SRCROOT)/Idevice";
 				SWIFT_OBJC_BRIDGING_HEADER = "Runner/Runner-Bridging-Header.h";
 				SWIFT_VERSION = 5.0;
 				VERSIONING_SYSTEM = "apple-generic";
@@ -947,6 +956,11 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = io.github.ccch1mneyyy.dshgo;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				HEADER_SEARCH_PATHS = "$(inherited) $(SRCROOT)/Idevice";
+				"LIBRARY_SEARCH_PATHS[sdk=iphoneos*]" = "$(inherited) $(SRCROOT)/Idevice";
+				"LIBRARY_SEARCH_PATHS[sdk=iphonesimulator*]" = "$(inherited) $(SRCROOT)/Idevice/sim";
+				OTHER_LDFLAGS = "$(inherited) -lidevice_ffi -lc++ -lz -lresolv";
+				SWIFT_INCLUDE_PATHS = "$(inherited) $(SRCROOT)/Idevice";
 				SWIFT_OBJC_BRIDGING_HEADER = "Runner/Runner-Bridging-Header.h";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
 				SWIFT_VERSION = 5.0;
@@ -971,6 +985,11 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = io.github.ccch1mneyyy.dshgo;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				HEADER_SEARCH_PATHS = "$(inherited) $(SRCROOT)/Idevice";
+				"LIBRARY_SEARCH_PATHS[sdk=iphoneos*]" = "$(inherited) $(SRCROOT)/Idevice";
+				"LIBRARY_SEARCH_PATHS[sdk=iphonesimulator*]" = "$(inherited) $(SRCROOT)/Idevice/sim";
+				OTHER_LDFLAGS = "$(inherited) -lidevice_ffi -lc++ -lz -lresolv";
+				SWIFT_INCLUDE_PATHS = "$(inherited) $(SRCROOT)/Idevice";
 				SWIFT_OBJC_BRIDGING_HEADER = "Runner/Runner-Bridging-Header.h";
 				SWIFT_VERSION = 5.0;
 				VERSIONING_SYSTEM = "apple-generic";
