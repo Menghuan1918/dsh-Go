@@ -43,7 +43,7 @@ Tested on iPhone 18 Pro Max, iOS 27.3, Xcode 27.2:
 - `screen` → element tree for `com.apple.springboard`.
 - `open` Settings → element tree for `com.apple.Preferences`.
 - `screen` after switching apps → still served by the runner; element tree for Settings.
-- `apps` → third-party list (BOCHK, ChatGPT, Chrome, DSH Go, ...), Apple/system entries filtered; a query still searches them.
+- `apps` → third-party app list; Apple/system entries filtered; a query still searches them.
 - `tap` by `screen` + id → returned a new screen.
 - `screen(image:true)` → 80–300 KB PNG.
 
